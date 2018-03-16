@@ -42,6 +42,7 @@
 (require 'michael-cider)
 (require 'prettify-utils)
 
+
 ;; ----------------------------------------------
 ;; look and feel
 ;; ----------------------------------------------
@@ -52,7 +53,6 @@
 (modify-syntax-entry ?- "w")
 
 ;; hide uneeded elements
-(menu-bar-mode 1)
 (menu-bar-mode -1)
 (when (fboundp 'tool-bar-mode)
   (tool-bar-mode -1))
@@ -256,7 +256,18 @@
 ;; ----------------------------------------------
 ;; configure various packages with use package
 ;; ----------------------------------------------
+
+
+;; ----------------------------------------------
+;;email
+;; ----------------------------------------------
+
+(require 'myemail)
+
+;; ----------------------------------------------
+
 (use-package org-bullets)
+(use-package fish-mode)
 (use-package diminish)
 (use-package cider-hydra
   :after (cider hydra))
@@ -394,7 +405,7 @@
   (global-set-key (kbd "<f24>") 'windmove-left)
   (global-set-key (kbd "<f27>") 'windmove-right)
   (global-set-key (kbd "s-0") '(elscreen-jump 0))
-  (global-set-key (kbd "<f2>") 'helm-descbinds)
+  (global-set-key (kbd "<f2>") 'universal-argument)
   )
 (use-package paradox
   :config (setq paradox-execute-asynchronously t
@@ -416,7 +427,7 @@
           "!"   'delete-other-windows
           ")"   'delete-window
           ":" 'helm-M-x
-          "<f14>"  'delete-other-windows
+          "<f14>"  'treemacs-delete-other-windows
           "b" 'helm-buffers-list
           "B" 'helm-bookmarks
           "F" 'helm-find-files
@@ -489,17 +500,17 @@
           "k t" 'elscreen-kill-tab-and-renumber
           "k w" 'delete-window
           "l l" 'nil
-          "m" 'nil
-          "m b" 'toggle-menu-bar-mode-from-frame
-          "ml"  'bookmark-bmenu-list
-          "ms" 'bookmark-set
+          "m" 'mu4e
+          ;; "m b" 'toggle-menu-bar-mode-from-frame
+          ;; "ml"  'bookmark-bmenu-list
+          ;; "ms" 'bookmark-set
           "n"     'evil-next-buffer
-          "o"   'nil
-          "o o" 'other-window
-          "o d" 'org-cut-subtree
-          "o i" 'nil
-          "o i c" 'org-insert-todo-heading
-          "o t" 'org-ctrl-c-ctrl-c
+          "o"   'other-window
+          ;; "o o" 'other-window
+          ;; "o d" 'org-cut-subtree
+          ;; "o i" 'nil
+          ;; "o i c" 'org-insert-todo-heading
+          ;; "o t" 'org-ctrl-c-ctrl-c
           "p"     'evil-prev-buffer
           "q" 'delete-window
           "q" 'kill-buffer-and-window
@@ -515,10 +526,11 @@
           ;; "s s t d a" 'sayid-trace-disable-all
           ;; "s s t p" 'sayid-query-form-at-point
           ;; "s s t d f" 'sayid-trace-fn-disable
-          "t c" 'elscreen-kill-tab-and-renumber
-          "t n" 'elscreen-create
-          "t t" 'treemacs-toggle
-          "t p" 'treemacs-projectile-toggle
+          "t" 'nil
+          ;; "t c" 'elscreen-kill-tab-and-renumber
+          ;; "t n" 'elscreen-create
+          "t" 'treemacs-projectile
+          "q" 'treemacs-projectile-toggle
           "x"         'cider-eval-defun-at-point
           "z"       'nil
           "z z"     'cider-right-repl
@@ -550,6 +562,7 @@
   (evil-set-initial-state 'bm-show-mode 'emacs)
   (evil-set-initial-state 'sayid-traced-mode 'emacs)
   (evil-set-initial-state 'sayid-mode 'emacs)
+  (evil-set-initial-state 'mu4e:main 'motion)
   ;;bindings
   (define-key evil-visual-state-map (kbd ">") 'djoyner/evil-shift-right-visual)
   (define-key evil-visual-state-map (kbd "<") 'djoyner/evil-shift-left-visual)
@@ -812,7 +825,8 @@
  '(global-visual-line-mode t)
  '(package-selected-packages
    (quote
-    (treemacs-evil treemacs-projectile treemacs helm-projectile evil-smartparens zeal-at-point which-key use-package telephone-line smartparens sayid rainbow-mode rainbow-delimiters projectile paradox org-bullets magit helpful helm-flycheck helm gist flycheck-pos-tip evil-tabs evil-leader evil-commentary diminish company cider-hydra avy)))
+    (mu4e-alert mu4e-maildirs-extension evil-mu4e oauth2 oath2 fish-mode rust-mode treemacs-evil treemacs-projectile treemacs helm-projectile evil-smartparens zeal-at-point which-key use-package telephone-line smartparens sayid rainbow-mode rainbow-delimiters projectile paradox org-bullets magit helpful helm-flycheck helm gist flycheck-pos-tip evil-tabs evil-leader evil-commentary diminish company cider-hydra avy)))
+ '(paradox-github-token t)
  '(send-mail-function (quote mailclient-send-it))
  '(telephone-line-mode t)
  '(tramp-syntax (quote default) nil (tramp)))
@@ -874,5 +888,23 @@
 
 (kill-scratch-buffer)
 ;; (byte-recompile-directory (expand-file-name "~/.emacs.d") 0)
+
+(defun michael-evil-bindings-cider ()
+  (interactive)
+  (evil-local-set-key 'normal "s" 'smartparens-hydra/body)
+  (evil-local-set-key 'normal "x" 'cider-eval-current-sexp)
+  (evil-local-set-key 'visual "x" 'cider-eval-region)
+  )
+
+(defun michael-evil-bindings-elisp ()
+  (interactive)
+  (evil-local-set-key 'normal "s" 'smartparens-hydra/body)
+  (evil-local-set-key 'normal "x" 'eval-defun)
+  (evil-local-set-key 'visual "x" 'eval-region)
+  )
+
+(add-hook 'cider-mode-hook 'michael-evil-bindings-cider)
+(add-hook 'elisp-refs-mode-hook 'michael-evil-bindings-elisp)
+
 (provide 'init)
 ;;; init.el ends here

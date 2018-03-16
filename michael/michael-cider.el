@@ -216,7 +216,6 @@
   (let ((current-prefix-arg 4))
     (call-interactively 'cider-find-dwim-other-window)))
 
-
 (defun mmr-eval-current-sexp ()
   (interactive)
   (save-excursion
